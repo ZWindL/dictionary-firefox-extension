@@ -36,7 +36,7 @@ function handleRemoved(id, removeInfo) {
   // When a bookmark is removed, check if the removed bookmark is the extension's folder. If so, reset extFolder.
 
   if (removeInfo.node.type !== 'folder') return;
-  
+
   browser.storage.local.get('extFolder').then(retrieved => {
     if (retrieved.extFolder && (retrieved.extFolder.id === id) ) {
       extFolder = undefined;
@@ -47,7 +47,7 @@ function handleRemoved(id, removeInfo) {
 
 
 function handleBookmarkAction(message) {
-  // When a popup is created for the first time during a session, set extFolder to the extension folder (or create a folder if none exists). Then, check whether the bookmark exists inside the extension folder. 
+  // When a popup is created for the first time during a session, set extFolder to the extension folder (or create a folder if none exists). Then, check whether the bookmark exists inside the extension folder.
 
   if (extFolder) {
     return getBookmark(extFolder).then(performAction);
@@ -63,31 +63,31 @@ function handleBookmarkAction(message) {
 
       } else {
         const folderTitle = "Merriam-Webster's Learner's Dictionary - Saved Entries";
-      
+
         return browser.bookmarks.create({
           title: folderTitle,
           type: 'folder'
         }).then( folder => {
           extFolder = folder;
           browser.storage.local.set({extFolder: folder});
-      
+
           return folder;
         });
       }
     });
   }
-  
+
   function getBookmark(folder) {
     return browser.bookmarks.search({url: message.url}).then( bookmarks => {
       if (bookmarks.length > 0) {
         for (let item of bookmarks) {
           if (item.parentId === folder.id) return item.id;
-        }    
+        }
       }
       return false;
-    }); 
+    });
   }
-    
+
   function performAction(id) {
     switch (message.action) {
       case 'update':
@@ -107,7 +107,7 @@ function handleBookmarkAction(message) {
           type: 'bookmark'
         }).then( bookmark => {
           browser.bookmarks.move(bookmark.id, {parentId: extFolder.id});
-        });   
+        });
         return true;
 
       } else {
